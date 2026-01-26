@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Stem-and-Leaf Explainer</title>
+    <title>Interactive Stem-and-Leaf Diagram</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@500&display=swap');
@@ -128,10 +128,10 @@
         }
     </style>
 </head>
-<body class="h-screen flex flex-col overflow-hidden">
+<body class="flex flex-col min-h-screen md:h-screen md:overflow-hidden bg-gray-50">
 
     <!-- Header -->
-    <header class="bg-white border-b border-gray-200 p-4 shadow-sm z-10">
+    <header class="bg-white border-b border-gray-200 p-4 shadow-sm z-10 shrink-0">
         <div class="max-w-6xl mx-auto flex justify-between items-center">
             <h1 class="text-xl font-bold text-gray-800 flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-indigo-600"><path d="M12 2v20"/><path d="M7 6l10 10"/><path d="M17 6L7 16"/></svg>
@@ -141,10 +141,13 @@
         </div>
     </header>
 
-    <main class="flex-1 overflow-hidden flex flex-col md:flex-row max-w-7xl mx-auto w-full">
+    <!-- Main Content -->
+    <!-- Changed: removed overflow-hidden for mobile, kept for md+ to maintain split pane feel on desktop -->
+    <main class="flex-1 flex flex-col md:flex-row md:overflow-hidden max-w-7xl mx-auto w-full">
         
         <!-- Left Panel: Controls & Input -->
-        <div class="w-full md:w-1/3 bg-white border-r border-gray-200 p-6 flex flex-col gap-6 overflow-y-auto">
+        <!-- Changed: removed overflow-y-auto for mobile so it flows naturally -->
+        <div class="w-full md:w-1/3 bg-white border-r border-gray-200 p-6 flex flex-col gap-6 md:overflow-y-auto shrink-0">
             
             <!-- Mode Header -->
             <div class="flex justify-between items-center pb-2 border-b border-gray-100">
@@ -214,7 +217,8 @@
         </div>
 
         <!-- Right Panel: The Visualization -->
-        <div class="flex-1 bg-gray-50 p-6 overflow-y-auto flex flex-col items-center">
+        <!-- Changed: removed overflow-y-auto for mobile -->
+        <div class="flex-1 bg-gray-50 p-6 md:overflow-y-auto flex flex-col items-center" id="rightPanel">
             
             <!-- Animation Stage (Shows current number processing) -->
             <div id="animationStage" class="h-24 w-full max-w-2xl mb-6 flex justify-center items-center gap-8 opacity-0 transition-opacity duration-300">
@@ -238,7 +242,7 @@
             </div>
 
             <!-- The Plot -->
-            <div class="w-full max-w-2xl bg-white shadow-lg rounded-xl overflow-hidden border border-gray-200 p-8">
+            <div id="diagramCard" class="w-full max-w-2xl bg-white shadow-lg rounded-xl overflow-hidden border border-gray-200 p-8">
                 <div class="flex justify-between items-end mb-6 border-b border-gray-100 pb-4">
                     <h2 id="plotTitle" class="text-2xl font-bold text-gray-800">Stem-and-Leaf Diagram</h2>
                     <div id="statsBadge" class="hidden text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
@@ -290,6 +294,15 @@
             el(id).classList.remove('hidden');
             if(type !== 'block') el(id).style.display = type;
         };
+
+        // Helper to scroll to visualization on mobile
+        function scrollToVis() {
+            if (window.innerWidth < 768) { // 768px is md breakpoint
+                setTimeout(() => {
+                    el('diagramCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+            }
+        }
 
         function addHeaderRow(container) {
             // Stem Header
@@ -400,6 +413,9 @@
             el('visualizeBtn').disabled = true;
             el('dataInput').disabled = true;
             el('quizActionBtn').disabled = true;
+            
+            // Scroll to visualization on mobile
+            scrollToVis();
 
             await visualSort(numbers);
             
@@ -559,6 +575,9 @@
             
             el('dataInput').disabled = true;
             el('dataInput').classList.add('bg-gray-100');
+            
+            // Scroll to quiz area on mobile
+            scrollToVis();
 
             // Generate Question
             randomizeData(true);
