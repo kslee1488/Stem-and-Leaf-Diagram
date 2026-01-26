@@ -414,10 +414,11 @@
             el('dataInput').disabled = true;
             el('quizActionBtn').disabled = true;
             
-            // Scroll to visualization on mobile
-            scrollToVis();
-
+            // Watch sorting first
             await visualSort(numbers);
+
+            // THEN Scroll to visualization on mobile
+            scrollToVis();
             
             resetPlotUI();
             
